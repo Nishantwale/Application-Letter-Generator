@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Letter Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<style>
+    body{
+        background-color: #F5F7F8;
+    }
+</style>
+<body>
+    
+    <div class="px-4 py-5 my-1 text-center">
+        <img class="d-block mx-auto mb-4" src="./images/nkocet.png" alt="NKOCET" height="150" style="border: 3px solid black;">
+        <h1 class="display-5 fw-bold text-body-emphasis"style="font-family: Verdana, Geneva, Tahoma, sans-serif;"><span style="color: #D2001A;">NKOCET</span> APPLICATION LETTER GENERATOR</h1>
+        <h2 class="mt-3 display-7 text-body-emphasis"style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Welcome To the <span style="color: #7F27FF;">NKOCET</span> Online Application Letter Generator</h2>
+    </div>
+
+    <div class="container">
+        <div class="my-1">
+            <div class="p-1 text-center">
+                <div class="container py-1">
+                    <h2 class="text-body-emphasis"style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Select Application Letter/Type</h2>
+                    <select class="form-select form-select-lg mb-3 mt-3 dropup" style="font-family: Verdana, Geneva, Tahoma, sans-serif;" id="selectLetter" aria-label="Large select example">
+                        <option>Select Letter</option>
+                        <option value="leave">Leave Application Letter</option>
+                        <option value="education">Education Loan letter</option>
+                        <option value="ticket">Permission letter to Principal for missing hall ticket.</option>
+                        <option value="fee">Request for getting your hall ticket as my fee is due</option>
+                        <option value="seminar">Regarding permission for organizing seminar</option>
+                        <option value="document">Application for return of original documents</option>
+                        <option value="exam">Application for exam permission</option>
+                        <option value="marksheet">Application for Correction of Marksheet in University</option>
+                        <option value="correction">Application for Marksheet Correction</option>
+                        <option value="job">Cover Letter for Job Application for Fresher</option>
+                        <option value="intern">For Scholarship/Internship/Apprenticeship</option>
+                        <option value="training">Request Letter for Internship Training</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <form id="letterForm" style="display: none;">
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Full Name</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Your Name" id="name" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div id="dynamicFields" class="mt-3">
+                    <!-- Dynamic fields will be added here based on selected letter type -->
+                </div>
+                <button type="button" id="generateButton" class="btn btn-outline-success btn-lg d-block mx-auto mt-5 mb-5">Generate Letter</button>
+            </form>
+            <div id="generatedLetter" class="mt-3" style="display: none;">
+                <!-- Generated letter will be displayed here -->
+            </div>
+            <button type="button" id="downloadBtn" class="btn btn-outline-danger btn-lg mx-auto mt-5 mb-5" style="display: none;">Download PDF</button>
+        </div>
+    </div>
+  
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('#selectLetter').change(function() {
+          const letterType = $(this).val();
+          if (letterType) {
+            $('#letterForm').show();
+            generateDynamicFields(letterType);
+            resetForm();
+            $('#generatedLetter').hide(); 
+            $('#downloadBtn').hide(); 
+          } else {
+            $('#letterForm').hide();
+          }
+        });
+  
+        $('#generateButton').click(function(event) {
+          event.preventDefault();
+          const letterType = $('#selectLetter').val();
+          const name = $('#name').val();
+          const formData = $(this).serializeArray();
+          const generatedContent = generateLetterContent(letterType, name, formData);
+          $('#generatedLetter').html(generatedContent).show();
+          $('#downloadBtn').show();
+        });
+  
+        $('#downloadBtn').click(function() {
+          const element = document.getElementById('generatedLetter');
+          html2pdf(element, {
+            margin: 10,
+            filename: 'Letter.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { dpi: 192, letterRendering: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          });
+        });
+      });
+      
+  
+      function generateDynamicFields(letterType) {
+        let dynamicFields = '';
+        switch (letterType) {
+          case 'leave':
+            dynamicFields = `
+            <div style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+              <div class="form-group">
+                <h2 class="text-body-emphasis text-center">Branch</h2>
+                <div class="input-group input-group-lg py-3">
+                    <input type="text" class="form-control" placeholder="Enter Your Branch" id="branch" name="branch" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <h2 class="text-body-emphasis text-center">Class and Roll No</h2>
+                <div class="input-group input-group-lg py-3">
+                    <input type="text" class="form-control" placeholder="Enter Your Roll No" id="roll" name="roll" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <h2 class="text-body-emphasis text-center">Reason For Leave</h2>
+                <div class="input-group input-group-lg py-3">
+                    <input type="text" class="form-control" placeholder="Reason" id="reason" name="reason" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                </div>
+              </div>
+            </div>  
+            `;
+            break;
+          case 'education':
+            dynamicFields = `
+            <div style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Branch Manager Name</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Name" id="manager" name="manager" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Bank Name</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Bank Name" id="bank" name="bank" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Education Loan</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="number" class="form-control" placeholder="Enter Amount" id="loan" name="loan" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Class and Roll No</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Your Roll No" id="rolls" name="rolls" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+              </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Recent Education</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Education" id="edu" name="edu" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Percentage</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="number" class="form-control" placeholder="Enter %" id="perc" name="perc" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Allocated College Name</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter College Name" id="collage" name="collage" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Branch</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Branch" id="branche" name="branche" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Start Date</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="date" class="form-control"  id="startDate" name="startDate" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Father's Name</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Father's Job" id="fname" name="fname" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h2 class="text-body-emphasis text-center">Father's Job</h2>
+                    <div class="input-group input-group-lg py-3">
+                        <input type="text" class="form-control" placeholder="Enter Father's Job" id="job" name="job" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+                    </div>
+                </div>
+            </div>    
+            `;
+            break;
+          // Add more cases for other letter types
+        }
+        $('#dynamicFields').html(dynamicFields);
+      }
+  
+      function generateLetterContent(letterType, name, formData) {
+        let content = '';
+        switch (letterType) {
+          case 'leave':
+            const branch = $('#branch').val();
+            const roll = $('#roll').val();
+            const reason = $('#reason').val();
+            content = `
+              <div class="generated-letter" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                <h2>Leave Application Letter</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To</p>
+                <p>The Principal,</p>
+                <p>N.K.Orchid College of Engineering and Technology,</p>
+                <p>Solapur.</p>
+                <p>Subject: ${reason}. </p>
+                <br>
+                <p>Respected Sir,</p>
+                <p>With humble submission this is to state that I am ${name}, a student of B.Tech (${branch}) ${roll}, am writing this letter to inform you of my inability to attend college lectures today due to personal reasons. There is an urgent matter that requires my attention at home, and therefore, I request leave for today.</p>
+                <p>I kindly request your understanding and approval for my leave. I assure you that I will make up for the missed lectures and fulfill any academic obligations promptly upon my return.</p>
+                <p>Thank you for considering my request. Your cooperation and support are highly appreciated.</p>
+                <br>
+                <p>Yours obediently,</p>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+              </div>
+            `;
+            break;
+          case 'education':
+            const manager = $('#manager').val();
+            const bank = $('#bank').val();
+            const loan = $('#loan').val();
+            const branche = $('#branche').val();
+            const rolls = $('#rolls').val();
+            const edu = $('#edu').val();
+            const perc = $('#perc').val();
+            const collage = $('#collage').val();
+            const startDate = $('#startDate').val();
+            const fname = $('#fname').val();
+            const job = $('#job').val();
+            content = `
+              <div class="generated-letter" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To,</p>
+                <p>Mr. ${manager},</p>
+                <p>The Branch Manager,</p>
+                <p>${bank}, Solapur</p>
+                <br>
+                <p>Sub: Regarding Education Loan</p>
+                <br>
+                <p>Dear Sir,</p>
+                <p>I am ${name} writing this letter to submit my request for an education loan of Rs.${loan} for my professional course.</p>
+                <p>I have scored ${perc} % in ${edu} education/examination and I have secured admission in ${collage}, Solapur in ${branche} Department which will start from ${startDate}. The duration of this course will be four years. 
+                <p>I will be in need of Rs.${loan} to meet all expenses including my college fees and hostel fees. I have submitted my loan application for the same.</p>
+                <p>My guarantor will be my father, ${fname}, who is working in an ${job} in Pune. And I choose to repay the loan after I finish my college.
+                <p>I request you to please consider my request for an education loan as I am in urgent need of it to support my studies. I have attached a photocopy of my admission letter from the college. I also have all my original documents ready to move ahead with the process.</p>
+                <p>Looking forward to your response.</p>
+                <br>
+                <p>Thanking you,</p>
+                <p>Yours faithfully,</p>
+                <p>${name}</p>
+                <p>${branche}</p>
+                <p>${rolls}</p>
+            `;
+            break;
+          // Add more cases for other letter types
+        }
+        return content;
+      }
+      function resetForm() {
+        // Reset form input values
+        $('#name').val('');
+        // Reset other fields as needed
+      }
+    </script>
+    </div>
+    
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

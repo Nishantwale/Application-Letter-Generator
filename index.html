@@ -5,27 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Letter Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital@0;1&family=Montserrat:ital,wght@0,500;1,500&family=Open+Sans:ital@0;1&display=swap" rel="stylesheet">
 </head>
 <style>
     body{
         background-color: #F5F7F8;
+        font-family: "Montserrat", sans-serif;
+        margin-top: 8vh;
+         /* Add margin-top equal to the height of the fixed header */
     }
+    
+    header {
+        background-color: #333;
+        color: white;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        padding: .6em;
+        z-index: 999; /* Ensure the header stays on top of other content */
+    }
+
+    @media (max-width: 991px){
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: .6em;
+        }
+    }
+    
+    /* Add margin to push content below the fixed header */
+    .container {
+        margin-top: 0; 
+    }
+
+    .generated-letter{
+      border: 3px solid black;
+      padding: 30px;
+    }
+
+    
+    
 </style>
 <body>
+  <header>
+    <h1>Application Letter Generator</h1>    
+  </header>
     
-    <div class="px-4 py-5 my-1 text-center">
-        <img class="d-block mx-auto mb-4" src="./images/nkocet.png" alt="NKOCET" height="150" style="border: 3px solid black;">
-        <h1 class="display-5 fw-bold text-body-emphasis"style="font-family: Verdana, Geneva, Tahoma, sans-serif;"><span style="color: #D2001A;">NKOCET</span> APPLICATION LETTER GENERATOR</h1>
-        <h2 class="mt-3 display-7 text-body-emphasis"style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Welcome To the <span style="color: #7F27FF;">NKOCET</span> Online Application Letter Generator</h2>
+    <div class="px-4 py-5 my-1 text-center mt-5">
+        <img class="d-block mx-auto mb-4" src="./images/nkocet.png" alt="NKOCET" height="150" style="border: 3px solid black; border-radius: 10px; padding: 4px;">
+        <h1 class="display-5 fw-bold text-body-emphasis"><span style="color: #D2001A;">NKOCET</span> APPLICATION LETTER GENERATOR</h1>
+        <h2 class="mt-3 display-7 text-body-emphasis"><span id="typedText"></span></h2>
     </div>
 
     <div class="container">
         <div class="my-1">
             <div class="p-1 text-center">
                 <div class="container py-1">
-                    <h2 class="text-body-emphasis"style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Select Application Letter/Type</h2>
-                    <select class="form-select form-select-lg mb-3 mt-3 dropup" style="font-family: Verdana, Geneva, Tahoma, sans-serif;" id="selectLetter" aria-label="Large select example">
-                        <option>Select Letter</option>
+                    <h2 class="text-body-emphasis">Select Application Letter/Type</h2>
+                    <select class="form-select form-select-lg mb-3 mt-3 dropup" id="selectLetter" aria-label="Large select example">
+                        <option id="close">Select Letter</option>
                         <option value="leave">Leave Application Letter</option>
                         <option value="education">Education Loan letter</option>
                         <option value="ticket">Permission letter to Principal for missing hall ticket.</option>
@@ -43,22 +87,48 @@
             </div>
         </div>
         <div class="container">
-            <form id="letterForm" style="display: none;">
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Full Name</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Your Name" id="name" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+          <div class="modal modal-sheet position-static d-block p-4 py-md-5" tabindex="-1" role="dialog" >
+            <div class="modal-dialog" role="document" style="max-width: 900px; margin: 0 auto;">
+              <div class="modal-content rounded-4 shadow" id="letterForm" style="display: none;">
+                <div class="modal-header p-5 pb-4 border-bottom-0">
+                  <h1 class="fw-bold mb-0 fs-2" ><span id="formTitle"></span></h1>
+                </div>
+          
+                <div class="modal-body p-5 pt-0">
+                  <form class="">
+                    <div class="form-floating mb-3">
+                      <input type="text" class="form-control rounded-3" id="name" name="name" placeholder="Enter Your Name" required>
+                      <label for="name">Full Name</label>
                     </div>
+                    <div class="form-floating mb-3">
+                      <input type="text" class="form-control rounded-3" id="institute" name="institute" placeholder="Enter Your College Name" required>
+                      <label for="institute">College Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="text" class="form-control rounded-3" id="branch" name="branch" placeholder="Enter Branch" required>
+                      <label for="branch">Branch</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="text" class="form-control rounded-3" id="roll" name="roll" placeholder="Enter class and Roll No" required>
+                      <label for="roll">Class and Roll No.</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="text" class="form-control rounded-3" id="city" name="city" placeholder="Enter Your City" required>
+                      <label for="city">City</label>
+                    </div>
+                    <div id="dynamicFields">
+
+                    </div>
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" id="generateButton" type="submit">Generate Letter</button>
+                  </form>
                 </div>
-                <div id="dynamicFields" class="mt-3">
-                    <!-- Dynamic fields will be added here based on selected letter type -->
-                </div>
-                <button type="button" id="generateButton" class="btn btn-outline-success btn-lg d-block mx-auto mt-5 mb-5">Generate Letter</button>
-            </form>
+              </div>
+            </div>
+          </div>
             <div id="generatedLetter" class="mt-3" style="display: none;">
                 <!-- Generated letter will be displayed here -->
             </div>
-            <button type="button" id="downloadBtn" class="btn btn-outline-danger btn-lg mx-auto mt-5 mb-5" style="display: none;">Download PDF</button>
+            <button type="button" id="downloadBtn" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary mt-3" style="display: none; text-align: center; color: #F5F7F8;">Download PDF</button>
         </div>
     </div>
   
@@ -70,23 +140,61 @@
       $(document).ready(function() {
         $('#selectLetter').change(function() {
           const letterType = $(this).val();
-          if (letterType) {
+          if (letterType && letterType !== "Select Letter") {
             $('#letterForm').show();
             generateDynamicFields(letterType);
             resetForm();
             $('#generatedLetter').hide(); 
             $('#downloadBtn').hide(); 
+            $('#formTitle').text(getFormTitle(letterType));
           } else {
             $('#letterForm').hide();
           }
         });
+
+
+        function getFormTitle(letterType) {
+          switch (letterType) {
+            case 'leave':
+              return "Leave Application Letter";
+            case 'education':
+              return "Education Loan Letter";
+            case 'ticket':
+              return "Permission letter to Principal for missing hall ticket";
+            case 'fee':
+              return "Request for getting your hall ticket as my fee is due";
+            case 'seminar':
+              return "Regarding permission for organizing seminar";
+            case 'document':
+              return "Application for return of original documents";
+            case 'exam':
+              return "Application for exam permission";
+            case 'marksheet':
+              return "Application for Correction of Marksheet in University";
+            case 'correction':
+              return "Application for Marksheet Correction";
+            case 'job':
+              return "Cover Letter for Job Application for Fresher";
+            case 'intern':
+              return "For Scholarship/Internship/Apprenticeship";
+            case 'training':
+              return "Request Letter for Internship Training";
+            // Add more cases for other letter types
+            default:
+              return "";
+          }
+        }
   
         $('#generateButton').click(function(event) {
           event.preventDefault();
           const letterType = $('#selectLetter').val();
           const name = $('#name').val();
+          const institute = $('#institute').val();
+          const branch = $('#branch').val();
+          const roll = $('#roll').val();
+          const city = $('#city').val();
           const formData = $(this).serializeArray();
-          const generatedContent = generateLetterContent(letterType, name, formData);
+          const generatedContent = generateLetterContent(letterType, name, institute, branch, roll, city, formData);
           $('#generatedLetter').html(generatedContent).show();
           $('#downloadBtn').show();
         });
@@ -97,11 +205,31 @@
             margin: 10,
             filename: 'Letter.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { dpi: 192, letterRendering: true },
+            html2canvas: { dpi: 300, letterRendering: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
           });
         });
       });
+
+      document.addEventListener("DOMContentLoaded", function() {
+    // Define the text to be typed
+    const text = "Welcome To the <span style='color: #7F27FF;'>NKOCET</span> Online Application Letter Generator";
+    
+    // Define TypewriterJS options
+    const options = {
+        loop: true, // Loop the animation
+        delay: 100, // Typing speed (in milliseconds)
+        deleteSpeed: 50, // Speed of deleting characters (in milliseconds)
+    };
+    
+    // Initialize TypewriterJS instance
+    const typewriter = new Typewriter("#typedText", options);
+    
+    // Add the text to be typed
+    typewriter.typeString(text)
+        .pauseFor(6000) // Pause for 2 seconds after typing
+        .start();
+});
       
   
       function generateDynamicFields(letterType) {
@@ -109,98 +237,201 @@
         switch (letterType) {
           case 'leave':
             dynamicFields = `
-            <div style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
-              <div class="form-group">
-                <h2 class="text-body-emphasis text-center">Branch</h2>
-                <div class="input-group input-group-lg py-3">
-                    <input type="text" class="form-control" placeholder="Enter Your Branch" id="branch" name="branch" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                </div>
-              </div>
-              <div class="form-group">
-                <h2 class="text-body-emphasis text-center">Class and Roll No</h2>
-                <div class="input-group input-group-lg py-3">
-                    <input type="text" class="form-control" placeholder="Enter Your Roll No" id="roll" name="roll" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                </div>
-              </div>
-              <div class="form-group">
-                <h2 class="text-body-emphasis text-center">Reason For Leave</h2>
-                <div class="input-group input-group-lg py-3">
-                    <input type="text" class="form-control" placeholder="Reason" id="reason" name="reason" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                </div>
-              </div>
-            </div>  
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="reason" name="reason" placeholder="Enter Reason" required>
+                <label for="reason">Reason For Leave</label>
+            </div> 
             `;
             break;
           case 'education':
             dynamicFields = `
-            <div style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Branch Manager Name</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Name" id="manager" name="manager" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Bank Name</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Bank Name" id="bank" name="bank" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Education Loan</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="number" class="form-control" placeholder="Enter Amount" id="loan" name="loan" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Class and Roll No</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Your Roll No" id="rolls" name="rolls" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-              </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Recent Education</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Education" id="edu" name="edu" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Percentage</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="number" class="form-control" placeholder="Enter %" id="perc" name="perc" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Allocated College Name</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter College Name" id="collage" name="collage" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Branch</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Branch" id="branche" name="branche" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Start Date</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="date" class="form-control"  id="startDate" name="startDate" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Father's Name</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Father's Job" id="fname" name="fname" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <h2 class="text-body-emphasis text-center">Father's Job</h2>
-                    <div class="input-group input-group-lg py-3">
-                        <input type="text" class="form-control" placeholder="Enter Father's Job" id="job" name="job" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
-                    </div>
-                </div>
-            </div>    
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="manager" name="manager" placeholder="Enter Your Name" required>
+              <label for="manager">Bank Manager Name</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="bank" name="bank" placeholder="Enter Your Name" required>
+              <label for="bank">Bank Name</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="number" class="form-control rounded-3" id="loan" name="loan" placeholder="Enter Your Name" required>
+              <label for="loan">Education Loan</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="edu" name="edu" placeholder="Enter Your Name" required>
+              <label for="edu">Recent Education</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="number" class="form-control rounded-3" id="perc" name="perc" placeholder="Enter Your Name" required>
+              <label for="perc">Percentage</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="date" class="form-control rounded-3" id="startDate" name="startDate" placeholder="Enter Your Name" required>
+              <label for="startDate">Start Date</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="fname" name="fname" placeholder="Enter Your Name" required>
+              <label for="fname">Father's Name</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="job" name="job" placeholder="Enter Your Name" required>
+              <label for="job">Father's Job</label>
+            </div>
+                
+            `;
+            break;
+            case 'seminar':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="topic" name="topic" placeholder="Enter Topic" required>
+                <label for="topic">Enter Seminar Topic</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control rounded-3" id="cdate" name="cdate" placeholder="Enter Date" required>
+                <label for="cdate">Enter Date of Seminar</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="wc" name="wc" placeholder="where To conduct" required>
+                <label for="wc">Location of Seminar?</label>
+            </div> 
+            `;
+            break;
+            case 'document':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="reason1" name="reason1" placeholder="Enter Reason" required>
+                <label for="reason1">Enter Reason for Return</label>
+            </div> 
+            `;
+            break;
+            case 'exam':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="reason2" name="reason2" placeholder="Enter Reason" required>
+                <label for="reason1">Reason for Low attendance</label>
+            </div> 
+            `;
+            break;
+            case 'marksheet':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="university" name="university" placeholder="Enter University name" required>
+                <label for="university">Enter University Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control rounded-3" id="sem" name="sem" placeholder="Enter semester" required>
+                <label for="sem">Enter Semester</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="subject" name="subject" placeholder="Enter subject name" required>
+                <label for="subject">Incorrect Marks Subject?</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control rounded-3" id="obtained" name="obtained" placeholder="Entermarks" required>
+                <label for="obtained">Enter Obtained Marks</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control rounded-3" id="incorrect" name="incorrect" placeholder="Entermarks" required>
+                <label for="incorrect">Enter Incorrect Marks</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="year" name="year" placeholder="Enter year" required>
+                <label for="year">Enter Start and Final Year</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control rounded-3" id="reg" name="reg" placeholder="Enter Reg.No" required>
+                <label for="reg">Enter Reg.No</label>
+            </div> 
+            `;
+            break;
+            case 'correction':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="university1" name="university1" placeholder="Enter University name" required>
+                <label for="university1">Enter University Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control rounded-3" id="reg1" name="reg1" placeholder="Enter reg no" required>
+                <label for="reg1">Enter Registeration Number</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="ic" name="ic" placeholder="Enter Reason" required>
+                <label for="ic">Enter Incorrect Name</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="correct" name="correct" placeholder="Enter Reason" required>
+                <label for="correct">Enter Correct Name</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="year1" name="year1" placeholder="Enter year" required>
+                <label for="year1">Enter Start and Final Year</label>
+            </div>
+            `;
+            break;
+            case 'job':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="company" name="company" placeholder="Enter University name" required>
+                <label for="company">Enter Applying Comapny</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="position" name="position" placeholder="Enter reg no" required>
+                <label for="position">Enter Applying Job Position</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="mname" name="mname" placeholder="Enter Reason" required>
+                <label for="mname">Enter Manager Name</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="where" name="where" placeholder="Enter Reason" required>
+                <label for="where">Where you seen this job</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="shikshan" name="shikshan" placeholder="Enter Reason" required>
+                <label for="shikshan">Enter Your Education</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="inte" name="inte" placeholder="Enter Reason" required>
+                <label for="inte">Internship Company Name</label>
+            </div> 
+            `;
+            break;
+            case 'intern':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="iname" name="iname" placeholder="Enter Reason" required>
+                <label for="iname">Enter Internship Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control rounded-3" id="sdate" name="sdate" placeholder="Enter Reason" required>
+                <label for="sdate">Enter Staring Date</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control rounded-3" id="edate" name="edate" placeholder="Enter Reason" required>
+                <label for="edate">Enter Ending Date</label>
+            </div>
+
+            `;
+            break;
+            case 'training':
+            dynamicFields = `
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="receiver" name="receiver" placeholder="Enter Reason" required>
+                <label for="receiver">Enter Receiver Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="jtitle" name="jtitle" placeholder="Enter Reason" required>
+                <label for="jtitle">Enter Job Title</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <textarea class="form-control rounded-3" id="address" name="address" placeholder="Enter Reason" required></textarea>
+                <label for="address">Enter Address</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" id="coname" name="coname" placeholder="Enter Reason" required>
+                <label for="coname">Enter Company Name</label>
+            </div> 
+
             `;
             break;
           // Add more cases for other letter types
@@ -208,21 +439,19 @@
         $('#dynamicFields').html(dynamicFields);
       }
   
-      function generateLetterContent(letterType, name, formData) {
+      function generateLetterContent(letterType, name, institute, branch, roll, city, formData) {
         let content = '';
         switch (letterType) {
           case 'leave':
-            const branch = $('#branch').val();
-            const roll = $('#roll').val();
             const reason = $('#reason').val();
             content = `
-              <div class="generated-letter" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
-                <h2>Leave Application Letter</h2>
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Leave Application Letter</h2>
                 <p>Date: ${new Date().toLocaleDateString()}</p>
                 <p>To</p>
                 <p>The Principal,</p>
-                <p>N.K.Orchid College of Engineering and Technology,</p>
-                <p>Solapur.</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
                 <p>Subject: ${reason}. </p>
                 <br>
                 <p>Respected Sir,</p>
@@ -231,6 +460,7 @@
                 <p>Thank you for considering my request. Your cooperation and support are highly appreciated.</p>
                 <br>
                 <p>Yours obediently,</p>
+                <br>
                 <p>${name}</p>
                 <p>${branch}</p>
                 <p>${roll}</p>
@@ -241,37 +471,311 @@
             const manager = $('#manager').val();
             const bank = $('#bank').val();
             const loan = $('#loan').val();
-            const branche = $('#branche').val();
-            const rolls = $('#rolls').val();
             const edu = $('#edu').val();
             const perc = $('#perc').val();
-            const collage = $('#collage').val();
             const startDate = $('#startDate').val();
             const fname = $('#fname').val();
             const job = $('#job').val();
             content = `
-              <div class="generated-letter" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Education Loan Letter</h2>
                 <p>Date: ${new Date().toLocaleDateString()}</p>
                 <p>To,</p>
                 <p>Mr. ${manager},</p>
                 <p>The Branch Manager,</p>
-                <p>${bank}, Solapur</p>
+                <p>${bank}, ${city}</p>
                 <br>
                 <p>Sub: Regarding Education Loan</p>
                 <br>
                 <p>Dear Sir,</p>
                 <p>I am ${name} writing this letter to submit my request for an education loan of Rs.${loan} for my professional course.</p>
-                <p>I have scored ${perc} % in ${edu} education/examination and I have secured admission in ${collage}, Solapur in ${branche} Department which will start from ${startDate}. The duration of this course will be four years. 
+                <p>I have scored ${perc} % in ${edu} education/examination and I have secured admission in ${institute}, ${city} in ${branch} Department which will start from ${startDate}. The duration of this course will be four years. 
                 <p>I will be in need of Rs.${loan} to meet all expenses including my college fees and hostel fees. I have submitted my loan application for the same.</p>
                 <p>My guarantor will be my father, ${fname}, who is working in an ${job} in Pune. And I choose to repay the loan after I finish my college.
                 <p>I request you to please consider my request for an education loan as I am in urgent need of it to support my studies. I have attached a photocopy of my admission letter from the college. I also have all my original documents ready to move ahead with the process.</p>
                 <p>Looking forward to your response.</p>
                 <br>
                 <p>Thanking you,</p>
+                <br>
                 <p>Yours faithfully,</p>
+                <br>
                 <p>${name}</p>
-                <p>${branche}</p>
-                <p>${rolls}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'ticket':
+            content = `
+              <div class="generated-letter" >
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Permission letter to Principal for missing hall ticket</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To</p>
+                <p>The Principal,</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
+                <p>Subject: Permission letter to principal for missing hall ticket. </p>
+                <br>
+                <p>Respected Sir,</p>
+                <p>I am writing this letter to seek your permission for issuance of a new hall ticket as I have misplaced the first one issued to me due to some unforeseen circumstances. I know issuance of a new hall ticket is a cumbersome process but without a hall ticket, I would not be allowed in the examination hall by the school administration.</p>
+                <p>I am a meritorious student and I also have a robust academic record. Please consider this request and direct the school administration to issue a duplicate hall ticket in my favor so that my career is not hindered due to not being able to participate in the examination process. I would be highly obliged if my request is considered.</p>
+                <br>
+                <p>Thanking you,</p>
+                <br>
+                <p>Yours obediently,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'fee':
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Request for getting your hall ticket as my fee is due</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To</p>
+                <p>The Principal,</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
+                <p>Subject: Request for getting hall ticket as my fee is due.</p>
+                <br>
+                <p>Respected Sir,</p>
+                <p>I am ${name}, a first-year student of engineering at our esteemed organization. Recently, my family has been facing a lot of economic problems. My father lost his job a couple of months ago, and as a result, it has become very difficult for us to pay the fees on time.</p>
+                <p>Due to this reason, I was unable to pay my fee, and as a consequence, I did not receive the exam ticket for my University exam, which is starting from the beginning of next month. I request you, sir, to kindly issue my hall ticket, and I assure you that the fees will be paid as soon as possible.</p>
+                <p>I shall be highly obliged if you kindly look into the matter.</p>
+                <br>
+                <p>Thanking you,</p>
+                <br>
+                <p>Yours obediently,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'seminar':
+            const topic = $('#topic').val();
+            const cdate = $('#cdate').val();
+            const wc = $('#wc').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Regarding permission for organizing seminar</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To</p>
+                <p>The Principal,</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
+                <p>Sub: Regarding permission for organizing seminar</p>
+                <br>
+                <p>Respected Sir,</p>
+                <p>I am ${name} and I am writing to request your permission to organize a seminar in our college. I am a student of ${roll} ${branch} branch and, along with a team of like-minded individuals, I have been working towards creating an educational and informative event for our school community.</p>
+                <p>The seminar is focused on ${topic} and is aimed at providing a platform for students to expand their knowledge and understand the latest advancements and developments in the field. Our goal is to create an engaging and interactive atmosphere for the attendees and make the seminar a memorable experience.</p>
+                <p>The event will be conducted on ${cdate} in the ${wc}. We have made all the necessary arrangements, including the invitation of knowledgeable and experienced speakers and the provision of audio-visual aids. Our team has also taken into consideration all the safety measures to ensure a smooth and secure event.</p>
+                <p>I am confident that this seminar will be a great success and will contribute significantly to the overall growth and development of our students. I would be honored if you could grant us your permission to proceed with the seminar.</p>
+                <p>I look forward to your positive response.</p>
+                <br>
+                <p>Thanking you,</p>
+                <br>
+                <p>Yours obediently,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+
+            case 'document':
+            const reason1 = $('#reason1').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for return of original documents</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To</p>
+                <p>The Principal,</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
+                <p>Sub: Application for return of original documents.</p>
+                <br>
+                <p>Respected Sir/Madam,</p>
+                <p>I am ${name}, pursuing ${roll} in ${branch} in our college. I am writing this to request my original character and study certificates to apply for ${reason1}.</p>
+                <p>In my present financial situation, this scholarship is very important for me.</p>
+                <p>So please provide me with my original character & study certificates.</p>
+                <p>I shall be grateful to you in this regard.</p>
+                <br>
+                <p>Thanking you.</p>
+                <br>
+                <p>Yours Sincerely,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'exam':
+            const reason2 = $('#reason2').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for exam permission</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>To</p>
+                <p>The Principal,</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
+                <p>Sub: Application for exam permission.</p>
+                <br>
+                <p>Respected Sir/Madam,</p>
+                <p>I am ${name}, Roll no. ${roll}, a student from ${branch} branch in your college. I regret to inform you that due to my lack of attendance, I am not allowed to write the final examinations.</p>
+                <p>I had a shortage of attendance due to ${reason2}, however, I was very well prepared for these examinations. So please help me by allowing me to the examination.</p>
+                <p>I will be very grateful to you for that.</p>
+                <br>
+                <p>Thanking you,</p>
+                <br>
+                <p>Yours Sincerely,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'marksheet':
+            const university = $('#university').val();
+            const sem = $('#sem').val();
+            const subject = $('#subject').val();
+            const obtained = $('#obtained').val();
+            const incorrect = $('#incorrect').val();
+            const year = $('#year').val();
+            const reg = $('#reg').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for Correction of Marksheet in University</h2>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>The Examination Department,</p>
+                <p>${institute},</p>
+                <p>${university}</p>
+                <p>Sub: Request to update the incorrect marks in the final semester marksheet</p>
+                <br>
+                <p>Respected Sir/Madam,</p>
+                <p>I, ${name}, would like to bring to your kind notice that I have received the final semester marksheet, but the marks mentioned for my ${sem} semester ${subject} paper are incorrect. I was awarded ${obtained} marks, but it is mentioned as ${incorrect} in the marksheet. It seems to be a typographical error.</p>
+                <p>I am attaching a copy of my answer sheets along with this letter for your reference. I request you to kindly update the mark sheet at the earliest so that I can proceed with my admission procedure. I shall be highly obliged to you for the same.</p>
+                <br>
+                <p>Thank you.</p>
+                <br>
+                <p>Yours sincerely,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch} (${year})</p>
+                <p>${roll}</p>
+                <p>Reg. No. ${reg}</p>
+            `;
+            break;
+            case 'correction':
+            const reg1 = $('#reg1').val();
+            const university1 = $('#university1').val();
+            const ic = $('#ic').val();
+            const correct = $('#correct').val();
+            const year1 = $('#year1').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for Marksheet Correction</h2>
+                <p>The Examination Department,</p>
+                <p>${university1},</p>
+                <p>Sub: Request to rectify the spelling of my name in the marksheet</p>
+                <br>
+                <p>Respected Sir/Madam,</p>
+                <p>I would like to bring to your kind notice that my name is incorrectly spelt in the final year mark sheet of my Engineering. My registration number is ${reg1} and my roll number is ${roll}. I have mentioned the incorrect and correct spellings below for your reference:</p>
+                <p><strong>Incorrect name</strong> - ${ic}</p>
+                <p><strong>Correct name</strong> - ${correct}</p>
+                <p>I have also attached a copy of my Aadhaar card along with the letter for verification. I request you to kindly change the spelling as mentioned above and issue the mark sheet so that it would not be a problem in the future.</p>
+                <br>
+                <p>Thank you.</p>
+                <br>
+                <p>Yours sincerely,</p>
+                <br>
+                <p>(${name})</p>
+                <p>${branch} (${year1})</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'job':
+            const company = $('#company').val();
+            const position = $('#position').val();
+            const mname = $('#mname').val();
+            const shikshan = $('#shikshan').val();
+            const inte = $('#inte').val();
+            const where = $('#where').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Cover Letter for Job Application for Fresher</h2>
+                <p>To,</p>
+                <p>The Hiring Manager,</p>
+                <p>${company}, ${city}.</p>
+                <p>Subject: Application for ${position} position</p>
+                <br>
+                <p>Dear Mr./Ms./Mrs. ${mname},</p>
+                <p>My name is ${name}. I came across the recent opening for ${position} on ${where}, and I believe that the role describes me perfectly. I have always been interested in the workspace that your organization is known to have in the market. I am seeking a challenging, competitive yet friendly environment, and I truly believe that working at your organization will be an enriching experience.</p>
+                <p>I have studied ${shikshan} ${branch} at ${institute} and I have recently completed a 3-month internship at ${inte}. It helped me learn about the type of roles and responsibilities in the field of ${branch}, the work ethics that need to be followed, as well as deadlines that need to be adhered to. I possess excellent communication and team working skills.</p>
+                <p>I have attached my resume along with the cover letter which contains my educational and professional qualifications. I will give a call to your office next week to know more about the job profile. You can also reach out to me at the contact details mentioned in the resume.</p>
+                <br>
+                <p>Thanking you,</p>
+                <br>
+                <p>Yours sincerely,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+            `;
+            break;
+            case 'intern':
+            const iname = $('#iname').val();
+            const sdate = $('#sdate').val();
+            const edate = $('#edate').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">For Scholarship/Internship/Apprenticeship</h2>
+                <p>To,</p>
+                <p>The Principal,</p>
+                <p>${institute},</p>
+                <p>${city}.</p>
+                <p>Sub: Application in Request of Bonafide Certificate for Internship/Apprenticeship</p>
+                <br>
+                <p>Dear Sir/Ma'am,</p>
+                <p>I am writing to request a bonafide certificate in support of my internship/apprenticeship programme at ${iname}. The internship/apprenticeship is scheduled to start from ${sdate} and end on ${edate}.</p>
+                <p>I have attached the necessary documents related to my internship/apprenticeship for your reference. Issuing a bonafide certificate will greatly assist me in fulfilling the requirements of the internship/apprenticeship programme.</p>
+                <br>
+                <p>Thank you for your attention to this matter. I would be grateful if the bonafide certificate could be issued at the earliest convenience.</p>
+                <br>
+                <p>Yours Sincerely,</p>
+                <br>
+                <p>(${name})</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            `;
+            break;
+            case 'training':
+            const jtitle = $('#jtitle').val();
+            const receiver = $('#receiver').val();
+            const address = $('#address').val();
+            const coname = $('#coname').val();
+            content = `
+              <div class="generated-letter">
+                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Request Letter for Internship Training</h2>
+                <p>${receiver}</p>
+                <p>${jtitle}</p>
+                <p>${coname}</p>
+                <p>${address}</p>
+                <p>Dear Sir/Madam,</p>
+                <p>I, ${name}, studying in ${roll} ${branch} branch at ${institute}, am a regular and hard-working student. As a part of my course, I would have to do an internship in which I will have to learn about the roles and responsibilities of the work profile I will be looking forward to have in future.</p>
+                <p>While listing out the potential company names, I came across your company which matches with the list of requirements I have. Also, I think that I will get a lot more to learn from your organization as I have also looked at the people working at company from so many years. I feel that I can get the best hands-on experience while doing an internship with your company.</p>
+                <p>I am also attaching my resume that lists out all my academic qualifications and credentials. Also, I have attached a list of projects and assignments that I have worked throughout the semester. I would request you to have a look at it and consider my application.</p>
+                <p>I will be looking forward to hearing from you about the possibility and opportunity further.</p>
+                <br>
+                <p>Thanking you,</p>
+                <br>
+                <p>Yours sincerely,</p>
+                <br>
+                <p>${name}</p>
+                <p>${branch}</p>
+                <p>${roll}</p>
+            </div>
             `;
             break;
           // Add more cases for other letter types
@@ -281,15 +785,47 @@
       function resetForm() {
         // Reset form input values
         $('#name').val('');
+        $('#institute').val('');
+        $('#branch').val('');
+        $('#roll').val('');
+        $('#city').val('');
         // Reset other fields as needed
       }
     </script>
     </div>
+    <div class="container">
+      <footer class="py-5 mt-3" style="border-top:2px solid black; padding-bottom: 0;">
+        <div class="row">
+          <div class="col-12 text-center">
+            <h5 class="" style="margin: 0; padding: 0;">© Copyright 2024 | NKOCET | NISHANT WALE, Inc. All rights reserved.</h5>
+          </div>
+        </div>
+      <div class="row justify-content-center justify-content-md-center py-4 my-1 text-center">
+        <ul class="list-unstyled d-flex justify-content-center">
+        <li class="ms-3"><a class="text-dark" href="https://www.linkedin.com/in/nishant-wale-6b2b641a2" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16">
+          <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+        </svg></a></li>
+        <li class="ms-3"><a class="text-dark" href="https://github.com/Nishantwale" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg></a></li>
+        <li class="ms-3"><a class="text-dark" href="https://instagram.com/mr_nishant_283" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
+          <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+        </svg></a></li>
+        <li class="ms-3"><a class="text-dark" href="https://nishantwale.github.io/My-New-Portfolio/" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+        </svg></a></li>
+      </ul>
+      </div>
+      
+    </footer>
+    </div>
+    
     
 
 
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/TypewriterJS/2.17.0/core.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

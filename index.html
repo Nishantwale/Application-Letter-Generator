@@ -13,7 +13,7 @@
     body{
         background-color: #F5F7F8;
         font-family: "Montserrat", sans-serif;
-        margin-top: 8vh;
+        margin-top: 10vh;
          /* Add margin-top equal to the height of the fixed header */
     }
     
@@ -37,6 +37,9 @@
             text-align: center;
             padding: .6em;
         }
+        body{
+          margin-top: 15vh;
+        }
     }
     
     /* Add margin to push content below the fixed header */
@@ -48,8 +51,11 @@
       border: 3px solid black;
       padding: 30px;
     }
+    /* Popup styles */
 
-    
+
+/* Media query for smaller screens (e.g., mobile devices) */
+
     
     
 </style>
@@ -57,6 +63,23 @@
   <header>
     <h1>Application Letter Generator</h1>    
   </header>
+
+  <div class="modal fade " id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">NKOCET</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Thanks For Downloading! Visit Again.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
     
     <div class="px-4 py-5 my-1 text-center mt-5">
         <img class="d-block mx-auto mb-4" src="./images/nkocet.png" alt="NKOCET" height="150" style="border: 3px solid black; border-radius: 10px; padding: 4px;">
@@ -129,7 +152,7 @@
             <div id="generatedLetter" class="mt-3" style="display: none;">
                 <!-- Generated letter will be displayed here -->
             </div>
-            <button type="button" id="downloadBtn" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary mt-3" style="display: none; text-align: center; color: #F5F7F8;">Download PDF</button>
+            <button type="button" id="downloadBtn" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="display: none; text-align: center; color: #F5F7F8;">Download PDF</button>
         </div>
     </div>
   
@@ -209,7 +232,9 @@
             html2canvas: { dpi: 300, letterRendering: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
           });
+          
         });
+        const myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), options)
       });
 
       document.addEventListener("DOMContentLoaded", function() {
@@ -268,7 +293,7 @@
             </div>
             <div class="form-floating mb-3">
               <input type="date" class="form-control rounded-3" id="startDate" name="startDate" placeholder="Enter Your Name" required>
-              <label for="startDate">Start Date</label>
+              <label for="startDate"> College Start Date</label>
             </div>
             <div class="form-floating mb-3">
               <input type="text" class="form-control rounded-3" id="fname" name="fname" placeholder="Enter Your Name" required>
@@ -325,7 +350,7 @@
             </div> 
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-3" id="subject" name="subject" placeholder="Enter subject name" required>
-                <label for="subject">Incorrect Marks Subject?</label>
+                <label for="subject">Incorrect Marks Subject Name?</label>
             </div> 
             <div class="form-floating mb-3">
                 <input type="number" class="form-control rounded-3" id="obtained" name="obtained" placeholder="Entermarks" required>
@@ -373,7 +398,7 @@
             dynamicFields = `
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-3" id="company" name="company" placeholder="Enter University name" required>
-                <label for="company">Enter Applying Comapny</label>
+                <label for="company">Enter Applying Comapny Name</label>
             </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-3" id="position" name="position" placeholder="Enter reg no" required>
@@ -381,11 +406,11 @@
             </div> 
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-3" id="mname" name="mname" placeholder="Enter Reason" required>
-                <label for="mname">Enter Manager Name</label>
+                <label for="mname">Enter Company's Manager Name</label>
             </div> 
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-3" id="where" name="where" placeholder="Enter Reason" required>
-                <label for="where">Where you seen this job</label>
+                <label for="where">Where you seen this job?</label>
             </div> 
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-3" id="shikshan" name="shikshan" placeholder="Enter Reason" required>
@@ -459,7 +484,6 @@
                 <p>With humble submission this is to state that I am ${name}, a student of B.Tech (${branch}) ${roll}, am writing this letter to inform you of my inability to attend college lectures today due to personal reasons. There is an urgent matter that requires my attention at home, and therefore, I request leave for today.</p>
                 <p>I kindly request your understanding and approval for my leave. I assure you that I will make up for the missed lectures and fulfill any academic obligations promptly upon my return.</p>
                 <p>Thank you for considering my request. Your cooperation and support are highly appreciated.</p>
-                <br>
                 <p>Yours obediently,</p>
                 <br>
                 <p>${name}</p>
@@ -485,7 +509,6 @@
                 <p>Mr. ${manager},</p>
                 <p>The Branch Manager,</p>
                 <p>${bank}, ${city}</p>
-                <br>
                 <p>Sub: Regarding Education Loan</p>
                 <br>
                 <p>Dear Sir,</p>
@@ -495,9 +518,7 @@
                 <p>My guarantor will be my father, ${fname}, who is working in an ${job} in Pune. And I choose to repay the loan after I finish my college.
                 <p>I request you to please consider my request for an education loan as I am in urgent need of it to support my studies. I have attached a photocopy of my admission letter from the college. I also have all my original documents ready to move ahead with the process.</p>
                 <p>Looking forward to your response.</p>
-                <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours faithfully,</p>
                 <br>
                 <p>${name}</p>
@@ -519,9 +540,7 @@
                 <p>Respected Sir,</p>
                 <p>I am writing this letter to seek your permission for issuance of a new hall ticket as I have misplaced the first one issued to me due to some unforeseen circumstances. I know issuance of a new hall ticket is a cumbersome process but without a hall ticket, I would not be allowed in the examination hall by the school administration.</p>
                 <p>I am a meritorious student and I also have a robust academic record. Please consider this request and direct the school administration to issue a duplicate hall ticket in my favor so that my career is not hindered due to not being able to participate in the examination process. I would be highly obliged if my request is considered.</p>
-                <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours obediently,</p>
                 <br>
                 <p>${name}</p>
@@ -544,9 +563,7 @@
                 <p>I am ${name}, a first-year student of engineering at our esteemed organization. Recently, my family has been facing a lot of economic problems. My father lost his job a couple of months ago, and as a result, it has become very difficult for us to pay the fees on time.</p>
                 <p>Due to this reason, I was unable to pay my fee, and as a consequence, I did not receive the exam ticket for my University exam, which is starting from the beginning of next month. I request you, sir, to kindly issue my hall ticket, and I assure you that the fees will be paid as soon as possible.</p>
                 <p>I shall be highly obliged if you kindly look into the matter.</p>
-                <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours obediently,</p>
                 <br>
                 <p>${name}</p>
@@ -574,9 +591,7 @@
                 <p>The event will be conducted on ${cdate} in the ${wc}. We have made all the necessary arrangements, including the invitation of knowledgeable and experienced speakers and the provision of audio-visual aids. Our team has also taken into consideration all the safety measures to ensure a smooth and secure event.</p>
                 <p>I am confident that this seminar will be a great success and will contribute significantly to the overall growth and development of our students. I would be honored if you could grant us your permission to proceed with the seminar.</p>
                 <p>I look forward to your positive response.</p>
-                <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours obediently,</p>
                 <br>
                 <p>${name}</p>
@@ -602,9 +617,7 @@
                 <p>In my present financial situation, this scholarship is very important for me.</p>
                 <p>So please provide me with my original character & study certificates.</p>
                 <p>I shall be grateful to you in this regard.</p>
-                <br>
                 <p>Thanking you.</p>
-                <br>
                 <p>Yours Sincerely,</p>
                 <br>
                 <p>${name}</p>
@@ -628,9 +641,7 @@
                 <p>I am ${name}, Roll no. ${roll}, a student from ${branch} branch in your college. I regret to inform you that due to my lack of attendance, I am not allowed to write the final examinations.</p>
                 <p>I had a shortage of attendance due to ${reason2}, however, I was very well prepared for these examinations. So please help me by allowing me to the examination.</p>
                 <p>I will be very grateful to you for that.</p>
-                <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours Sincerely,</p>
                 <br>
                 <p>${name}</p>
@@ -658,9 +669,7 @@
                 <p>Respected Sir/Madam,</p>
                 <p>I, ${name}, would like to bring to your kind notice that I have received the final semester marksheet, but the marks mentioned for my ${sem} semester ${subject} paper are incorrect. I was awarded ${obtained} marks, but it is mentioned as ${incorrect} in the marksheet. It seems to be a typographical error.</p>
                 <p>I am attaching a copy of my answer sheets along with this letter for your reference. I request you to kindly update the mark sheet at the earliest so that I can proceed with my admission procedure. I shall be highly obliged to you for the same.</p>
-                <br>
                 <p>Thank you.</p>
-                <br>
                 <p>Yours sincerely,</p>
                 <br>
                 <p>${name}</p>
@@ -687,9 +696,7 @@
                 <p><strong>Incorrect name</strong> - ${ic}</p>
                 <p><strong>Correct name</strong> - ${correct}</p>
                 <p>I have also attached a copy of my Aadhaar card along with the letter for verification. I request you to kindly change the spelling as mentioned above and issue the mark sheet so that it would not be a problem in the future.</p>
-                <br>
                 <p>Thank you.</p>
-                <br>
                 <p>Yours sincerely,</p>
                 <br>
                 <p>(${name})</p>
@@ -716,13 +723,12 @@
                 <p>My name is ${name}. I came across the recent opening for ${position} on ${where}, and I believe that the role describes me perfectly. I have always been interested in the workspace that your organization is known to have in the market. I am seeking a challenging, competitive yet friendly environment, and I truly believe that working at your organization will be an enriching experience.</p>
                 <p>I have studied ${shikshan} ${branch} at ${institute} and I have recently completed a 3-month internship at ${inte}. It helped me learn about the type of roles and responsibilities in the field of ${branch}, the work ethics that need to be followed, as well as deadlines that need to be adhered to. I possess excellent communication and team working skills.</p>
                 <p>I have attached my resume along with the cover letter which contains my educational and professional qualifications. I will give a call to your office next week to know more about the job profile. You can also reach out to me at the contact details mentioned in the resume.</p>
-                <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours sincerely,</p>
                 <br>
                 <p>${name}</p>
                 <p>${branch}</p>
+                <p>${roll}</p>
             `;
             break;
             case 'intern':
@@ -743,7 +749,6 @@
                 <p>I have attached the necessary documents related to my internship/apprenticeship for your reference. Issuing a bonafide certificate will greatly assist me in fulfilling the requirements of the internship/apprenticeship programme.</p>
                 <br>
                 <p>Thank you for your attention to this matter. I would be grateful if the bonafide certificate could be issued at the earliest convenience.</p>
-                <br>
                 <p>Yours Sincerely,</p>
                 <br>
                 <p>(${name})</p>
@@ -763,6 +768,7 @@
                 <p>${jtitle}</p>
                 <p>${coname}</p>
                 <p>${address}</p>
+                <br>
                 <p>Dear Sir/Madam,</p>
                 <p>I, ${name}, studying in ${roll} ${branch} branch at ${institute}, am a regular and hard-working student. As a part of my course, I would have to do an internship in which I will have to learn about the roles and responsibilities of the work profile I will be looking forward to have in future.</p>
                 <p>While listing out the potential company names, I came across your company which matches with the list of requirements I have. Also, I think that I will get a lot more to learn from your organization as I have also looked at the people working at company from so many years. I feel that I can get the best hands-on experience while doing an internship with your company.</p>
@@ -770,7 +776,6 @@
                 <p>I will be looking forward to hearing from you about the possibility and opportunity further.</p>
                 <br>
                 <p>Thanking you,</p>
-                <br>
                 <p>Yours sincerely,</p>
                 <br>
                 <p>${name}</p>

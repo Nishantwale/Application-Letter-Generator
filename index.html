@@ -29,6 +29,20 @@
         padding: .6em;
         z-index: 999; /* Ensure the header stays on top of other content */
     }
+    .rightAlign{
+      text-align: right;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .button-container button + button {
+        margin-left: 10px;
+    }
 
     @media (max-width: 991px){
         header {
@@ -50,20 +64,52 @@
     .generated-letter{
       border: 3px solid black;
       padding: 30px;
+      text-align: justify;
     }
+    .generated-letter img {
+            max-width: 100px;
+            height: auto;
+            margin-top: -10px;
+            margin-left: 20px;
+            margin-bottom: 10px;
+    }
+    /* @media (max-width: 767px) {
+    .generated-letter img {
+        max-width: 80%; 
+    }
+} */
     /* Popup styles */
 
 
 /* Media query for smaller screens (e.g., mobile devices) */
 
-    
+#colorPalette {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            z-index: 9999; /* Ensure the palette stays on top of other content */
+        }
+
+        .color {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid black;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        
+
     
 </style>
 <body>
   <header>
     <h1>Application Letter Generator</h1>    
   </header>
-
+  
   <div class="modal fade " id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -80,7 +126,8 @@
       </div>
     </div>
   </div>
-    
+  
+  
     <div class="px-4 py-5 my-1 text-center mt-5">
         <img class="d-block mx-auto mb-4" src="./images/nkocet.png" alt="NKOCET" height="150" style="border: 3px solid black; border-radius: 10px; padding: 4px;">
         <h1 class="display-5 fw-bold text-body-emphasis"><span style="color: #D2001A;">NKOCET</span> APPLICATION LETTER GENERATOR</h1>
@@ -140,6 +187,10 @@
                       <input type="text" class="form-control rounded-3" id="city" name="city" placeholder="Enter Your City" required>
                       <label for="city">City</label>
                     </div>
+                    <div class="form-floating mb-3">
+                      <input type="file" class="form-control rounded-3" id="image" name="image" required>
+                      <label for="image">Upload Image</label>
+                    </div>
                     <div id="dynamicFields">
 
                     </div>
@@ -149,8 +200,12 @@
               </div>
             </div>
           </div>
-            <div id="generatedLetter" class="mt-3" style="display: none;">
+            <div id="generatedLetter" contenteditable="true" class="mt-3" style="display: none;">
                 <!-- Generated letter will be displayed here -->
+            </div>
+            <div class="button-container">
+              <button id="speakButton" class="w-100 mb-2 btn btn-lg rounded-3 btn-success mt-3" style="display: none; text-align: center; color: #F5F7F8;">Speak</button>
+            <button id="closeButton" class="w-100 mb-2 btn btn-lg rounded-3 btn-danger mt-3" style="display: none; text-align: center; color: #F5F7F8;">Close</button>
             </div>
             <button type="button" id="downloadBtn" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="display: none; text-align: center; color: #F5F7F8;">Download PDF</button>
         </div>
@@ -217,9 +272,12 @@
           const branch = $('#branch').val();
           const roll = $('#roll').val();
           const city = $('#city').val();
+          const image = $('#image')[0].files[0]; 
           const formData = $(this).serializeArray();
-          const generatedContent = generateLetterContent(letterType, name, institute, branch, roll, city, formData);
+          const generatedContent = generateLetterContent(letterType, name, institute, branch, roll, city, image, formData);
           $('#generatedLetter').html(generatedContent).show();
+          $('#speakButton').show();
+          $('#closeButton').show();
           $('#downloadBtn').show();
         });
   
@@ -234,6 +292,43 @@
           });
           
         });
+                const speakButton = document.getElementById('speakButton');
+                const closeButton = document.getElementById('closeButton'); // Add this line to get the close button
+                const letterspeak = document.getElementById('generatedLetter');
+
+                speakButton.addEventListener('click', () => {
+                    const text = letterspeak.innerText;
+                    speak(text);
+                });
+
+                closeButton.addEventListener('click', () => {
+                    stopSpeaking();
+                });
+
+                let speaking = false;
+
+                function speak(text) {
+                    if (!speaking) {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.addEventListener('start', () => {
+                            speaking = true;
+                        });
+                        utterance.addEventListener('end', () => {
+                            speaking = false;
+                        });
+                        speechSynthesis.speak(utterance);
+                    }
+                }
+
+                function stopSpeaking() {
+                    if (speaking) {
+                        speechSynthesis.cancel();
+                        speaking = false;
+                    }
+                }
+                window.addEventListener('beforeunload', () => {
+                    stopSpeaking();
+                });
         const myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), options)
       });
 
@@ -260,6 +355,7 @@
   
       function generateDynamicFields(letterType) {
         let dynamicFields = '';
+        
         switch (letterType) {
           case 'leave':
             dynamicFields = `
@@ -465,327 +561,373 @@
         $('#dynamicFields').html(dynamicFields);
       }
   
-      function generateLetterContent(letterType, name, institute, branch, roll, city, formData) {
+      function generateLetterContent(letterType, name, institute, branch, roll, city, image, formData) {
         let content = '';
-        switch (letterType) {
-          case 'leave':
-            const reason = $('#reason').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Leave Application Letter</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Subject: ${reason}. </p>
-                <br>
-                <p>Respected Sir,</p>
-                <p>With humble submission this is to state that I am ${name}, a student of B.Tech (${branch}) ${roll}, am writing this letter to inform you of my inability to attend college lectures today due to personal reasons. There is an urgent matter that requires my attention at home, and therefore, I request leave for today.</p>
-                <p>I kindly request your understanding and approval for my leave. I assure you that I will make up for the missed lectures and fulfill any academic obligations promptly upon my return.</p>
-                <p>Thank you for considering my request. Your cooperation and support are highly appreciated.</p>
-                <p>Yours obediently,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-              </div>
-            `;
-            break;
-          case 'education':
-            const manager = $('#manager').val();
-            const bank = $('#bank').val();
-            const loan = $('#loan').val();
-            const edu = $('#edu').val();
-            const perc = $('#perc').val();
-            const startDate = $('#startDate').val();
-            const fname = $('#fname').val();
-            const job = $('#job').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Education Loan Letter</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To,</p>
-                <p>Mr. ${manager},</p>
-                <p>The Branch Manager,</p>
-                <p>${bank}, ${city}</p>
-                <p>Sub: Regarding Education Loan</p>
-                <br>
-                <p>Dear Sir,</p>
-                <p>I am ${name} writing this letter to submit my request for an education loan of Rs.${loan} for my professional course.</p>
-                <p>I have scored ${perc} % in ${edu} education/examination and I have secured admission in ${institute}, ${city} in ${branch} Department which will start from ${startDate}. The duration of this course will be four years. 
-                <p>I will be in need of Rs.${loan} to meet all expenses including my college fees and hostel fees. I have submitted my loan application for the same.</p>
-                <p>My guarantor will be my father, ${fname}, who is working in an ${job} in Pune. And I choose to repay the loan after I finish my college.
-                <p>I request you to please consider my request for an education loan as I am in urgent need of it to support my studies. I have attached a photocopy of my admission letter from the college. I also have all my original documents ready to move ahead with the process.</p>
-                <p>Looking forward to your response.</p>
-                <p>Thanking you,</p>
-                <p>Yours faithfully,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'ticket':
-            content = `
-              <div class="generated-letter" >
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Permission letter to Principal for missing hall ticket</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Subject: Permission letter to principal for missing hall ticket. </p>
-                <br>
-                <p>Respected Sir,</p>
-                <p>I am writing this letter to seek your permission for issuance of a new hall ticket as I have misplaced the first one issued to me due to some unforeseen circumstances. I know issuance of a new hall ticket is a cumbersome process but without a hall ticket, I would not be allowed in the examination hall by the school administration.</p>
-                <p>I am a meritorious student and I also have a robust academic record. Please consider this request and direct the school administration to issue a duplicate hall ticket in my favor so that my career is not hindered due to not being able to participate in the examination process. I would be highly obliged if my request is considered.</p>
-                <p>Thanking you,</p>
-                <p>Yours obediently,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'fee':
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Request for getting your hall ticket as my fee is due</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Subject: Request for getting hall ticket as my fee is due.</p>
-                <br>
-                <p>Respected Sir,</p>
-                <p>I am ${name}, a first-year student of engineering at our esteemed organization. Recently, my family has been facing a lot of economic problems. My father lost his job a couple of months ago, and as a result, it has become very difficult for us to pay the fees on time.</p>
-                <p>Due to this reason, I was unable to pay my fee, and as a consequence, I did not receive the exam ticket for my University exam, which is starting from the beginning of next month. I request you, sir, to kindly issue my hall ticket, and I assure you that the fees will be paid as soon as possible.</p>
-                <p>I shall be highly obliged if you kindly look into the matter.</p>
-                <p>Thanking you,</p>
-                <p>Yours obediently,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'seminar':
-            const topic = $('#topic').val();
-            const cdate = $('#cdate').val();
-            const wc = $('#wc').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Regarding permission for organizing seminar</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Sub: Regarding permission for organizing seminar</p>
-                <br>
-                <p>Respected Sir,</p>
-                <p>I am ${name} and I am writing to request your permission to organize a seminar in our college. I am a student of ${roll} ${branch} branch and, along with a team of like-minded individuals, I have been working towards creating an educational and informative event for our school community.</p>
-                <p>The seminar is focused on ${topic} and is aimed at providing a platform for students to expand their knowledge and understand the latest advancements and developments in the field. Our goal is to create an engaging and interactive atmosphere for the attendees and make the seminar a memorable experience.</p>
-                <p>The event will be conducted on ${cdate} in the ${wc}. We have made all the necessary arrangements, including the invitation of knowledgeable and experienced speakers and the provision of audio-visual aids. Our team has also taken into consideration all the safety measures to ensure a smooth and secure event.</p>
-                <p>I am confident that this seminar will be a great success and will contribute significantly to the overall growth and development of our students. I would be honored if you could grant us your permission to proceed with the seminar.</p>
-                <p>I look forward to your positive response.</p>
-                <p>Thanking you,</p>
-                <p>Yours obediently,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            const imageUrl = reader.result;
+            switch (letterType) {
+              case 'leave':
+                const reason = $('#reason').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Leave Application Letter</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Subject: ${reason}. </p>
+                    <br>
+                    <p>Respected Sir,</p>
+                    <p>With humble submission this is to state that I am ${name}, a student of B.Tech (${branch}) ${roll}, am writing this letter to inform you of my inability to attend college lectures today due to personal reasons. There is an urgent matter that requires my attention at home, and therefore, I request leave for today.</p>
+                    <p>I kindly request your understanding and approval for my leave. I assure you that I will make up for the missed lectures and fulfill any academic obligations promptly upon my return.</p>
+                    <p>Thank you for considering my request. Your cooperation and support are highly appreciated.</p>
+                    <div class="rightAlign">
+                    <p>Yours obediently,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>
+                `;
+                break;
+              case 'education':
+                const manager = $('#manager').val();
+                const bank = $('#bank').val();
+                const loan = $('#loan').val();
+                const edu = $('#edu').val();
+                const perc = $('#perc').val();
+                const startDate = $('#startDate').val();
+                const fname = $('#fname').val();
+                const job = $('#job').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Education Loan Letter</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To,</p>
+                    <p>Mr. ${manager},</p>
+                    <p>The Branch Manager,</p>
+                    <p>${bank}, ${city}</p>
+                    <p>Sub: Regarding Education Loan</p>
+                    <br>
+                    <p>Dear Sir,</p>
+                    <p>I am ${name} writing this letter to submit my request for an education loan of Rs.${loan} for my professional course.</p>
+                    <p>I have scored ${perc} % in ${edu} education/examination and I have secured admission in ${institute}, ${city} in ${branch} Department which will start from ${startDate}. The duration of this course will be four years. 
+                    <p>I will be in need of Rs.${loan} to meet all expenses including my college fees and hostel fees. I have submitted my loan application for the same.</p>
+                    <p>My guarantor will be my father, ${fname}, who is working in an ${job} in Pune. And I choose to repay the loan after I finish my college.
+                    <p>I request you to please consider my request for an education loan as I am in urgent need of it to support my studies. I have attached a photocopy of my admission letter from the college. I also have all my original documents ready to move ahead with the process.</p>
+                    <p>Looking forward to your response.</p>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours faithfully,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>
+                `;
+                break;
+                case 'ticket':
+                content = `
+                  <div class="generated-letter" >
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Permission letter to Principal for missing hall ticket</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Subject: Permission letter to principal for missing hall ticket. </p>
+                    <br>
+                    <p>Respected Sir,</p>
+                    <p>I am writing this letter to seek your permission for issuance of a new hall ticket as I have misplaced the first one issued to me due to some unforeseen circumstances. I know issuance of a new hall ticket is a cumbersome process but without a hall ticket, I would not be allowed in the examination hall by the school administration.</p>
+                    <p>I am a meritorious student and I also have a robust academic record. Please consider this request and direct the school administration to issue a duplicate hall ticket in my favor so that my career is not hindered due to not being able to participate in the examination process. I would be highly obliged if my request is considered.</p>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours obediently,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>  
+                `;
+                break;
+                case 'fee':
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Request for getting your hall ticket as my fee is due</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Subject: Request for getting hall ticket as my fee is due.</p>
+                    <br>
+                    <p>Respected Sir,</p>
+                    <p>I am ${name}, a first-year student of engineering at our esteemed organization. Recently, my family has been facing a lot of economic problems. My father lost his job a couple of months ago, and as a result, it has become very difficult for us to pay the fees on time.</p>
+                    <p>Due to this reason, I was unable to pay my fee, and as a consequence, I did not receive the exam ticket for my University exam, which is starting from the beginning of next month. I request you, sir, to kindly issue my hall ticket, and I assure you that the fees will be paid as soon as possible.</p>
+                    <p>I shall be highly obliged if you kindly look into the matter.</p>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours obediently,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>
+                `;
+                break;
+                case 'seminar':
+                const topic = $('#topic').val();
+                const cdate = $('#cdate').val();
+                const wc = $('#wc').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Regarding permission for organizing seminar</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Sub: Regarding permission for organizing seminar</p>
+                    <br>
+                    <p>Respected Sir,</p>
+                    <p>I am ${name} and I am writing to request your permission to organize a seminar in our college. I am a student of ${roll} ${branch} branch and, along with a team of like-minded individuals, I have been working towards creating an educational and informative event for our school community.</p>
+                    <p>The seminar is focused on ${topic} and is aimed at providing a platform for students to expand their knowledge and understand the latest advancements and developments in the field. Our goal is to create an engaging and interactive atmosphere for the attendees and make the seminar a memorable experience.</p>
+                    <p>The event will be conducted on ${cdate} in the ${wc}. We have made all the necessary arrangements, including the invitation of knowledgeable and experienced speakers and the provision of audio-visual aids. Our team has also taken into consideration all the safety measures to ensure a smooth and secure event.</p>
+                    <p>I am confident that this seminar will be a great success and will contribute significantly to the overall growth and development of our students. I would be honored if you could grant us your permission to proceed with the seminar.</p>
+                    <p>I look forward to your positive response.</p>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours obediently,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>  
+                `;
+                break;
 
-            case 'document':
-            const reason1 = $('#reason1').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for return of original documents</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Sub: Application for return of original documents.</p>
-                <br>
-                <p>Respected Sir/Madam,</p>
-                <p>I am ${name}, pursuing ${roll} in ${branch} in our college. I am writing this to request my original character and study certificates to apply for ${reason1}.</p>
-                <p>In my present financial situation, this scholarship is very important for me.</p>
-                <p>So please provide me with my original character & study certificates.</p>
-                <p>I shall be grateful to you in this regard.</p>
-                <p>Thanking you.</p>
-                <p>Yours Sincerely,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'exam':
-            const reason2 = $('#reason2').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for exam permission</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>To</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Sub: Application for exam permission.</p>
-                <br>
-                <p>Respected Sir/Madam,</p>
-                <p>I am ${name}, Roll no. ${roll}, a student from ${branch} branch in your college. I regret to inform you that due to my lack of attendance, I am not allowed to write the final examinations.</p>
-                <p>I had a shortage of attendance due to ${reason2}, however, I was very well prepared for these examinations. So please help me by allowing me to the examination.</p>
-                <p>I will be very grateful to you for that.</p>
-                <p>Thanking you,</p>
-                <p>Yours Sincerely,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'marksheet':
-            const university = $('#university').val();
-            const sem = $('#sem').val();
-            const subject = $('#subject').val();
-            const obtained = $('#obtained').val();
-            const incorrect = $('#incorrect').val();
-            const year = $('#year').val();
-            const reg = $('#reg').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for Correction of Marksheet in University</h2>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>The Examination Department,</p>
-                <p>${institute},</p>
-                <p>${university}</p>
-                <p>Sub: Request to update the incorrect marks in the final semester marksheet</p>
-                <br>
-                <p>Respected Sir/Madam,</p>
-                <p>I, ${name}, would like to bring to your kind notice that I have received the final semester marksheet, but the marks mentioned for my ${sem} semester ${subject} paper are incorrect. I was awarded ${obtained} marks, but it is mentioned as ${incorrect} in the marksheet. It seems to be a typographical error.</p>
-                <p>I am attaching a copy of my answer sheets along with this letter for your reference. I request you to kindly update the mark sheet at the earliest so that I can proceed with my admission procedure. I shall be highly obliged to you for the same.</p>
-                <p>Thank you.</p>
-                <p>Yours sincerely,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch} (${year})</p>
-                <p>${roll}</p>
-                <p>Reg. No. ${reg}</p>
-            `;
-            break;
-            case 'correction':
-            const reg1 = $('#reg1').val();
-            const university1 = $('#university1').val();
-            const ic = $('#ic').val();
-            const correct = $('#correct').val();
-            const year1 = $('#year1').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for Marksheet Correction</h2>
-                <p>The Examination Department,</p>
-                <p>${university1},</p>
-                <p>Sub: Request to rectify the spelling of my name in the marksheet</p>
-                <br>
-                <p>Respected Sir/Madam,</p>
-                <p>I would like to bring to your kind notice that my name is incorrectly spelt in the final year mark sheet of my Engineering. My registration number is ${reg1} and my roll number is ${roll}. I have mentioned the incorrect and correct spellings below for your reference:</p>
-                <p><strong>Incorrect name</strong> - ${ic}</p>
-                <p><strong>Correct name</strong> - ${correct}</p>
-                <p>I have also attached a copy of my Aadhaar card along with the letter for verification. I request you to kindly change the spelling as mentioned above and issue the mark sheet so that it would not be a problem in the future.</p>
-                <p>Thank you.</p>
-                <p>Yours sincerely,</p>
-                <br>
-                <p>(${name})</p>
-                <p>${branch} (${year1})</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'job':
-            const company = $('#company').val();
-            const position = $('#position').val();
-            const mname = $('#mname').val();
-            const shikshan = $('#shikshan').val();
-            const inte = $('#inte').val();
-            const where = $('#where').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Cover Letter for Job Application for Fresher</h2>
-                <p>To,</p>
-                <p>The Hiring Manager,</p>
-                <p>${company}, ${city}.</p>
-                <p>Subject: Application for ${position} position</p>
-                <br>
-                <p>Dear Mr./Ms./Mrs. ${mname},</p>
-                <p>My name is ${name}. I came across the recent opening for ${position} on ${where}, and I believe that the role describes me perfectly. I have always been interested in the workspace that your organization is known to have in the market. I am seeking a challenging, competitive yet friendly environment, and I truly believe that working at your organization will be an enriching experience.</p>
-                <p>I have studied ${shikshan} ${branch} at ${institute} and I have recently completed a 3-month internship at ${inte}. It helped me learn about the type of roles and responsibilities in the field of ${branch}, the work ethics that need to be followed, as well as deadlines that need to be adhered to. I possess excellent communication and team working skills.</p>
-                <p>I have attached my resume along with the cover letter which contains my educational and professional qualifications. I will give a call to your office next week to know more about the job profile. You can also reach out to me at the contact details mentioned in the resume.</p>
-                <p>Thanking you,</p>
-                <p>Yours sincerely,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'intern':
-            const iname = $('#iname').val();
-            const sdate = $('#sdate').val();
-            const edate = $('#edate').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">For Scholarship/Internship/Apprenticeship</h2>
-                <p>To,</p>
-                <p>The Principal,</p>
-                <p>${institute},</p>
-                <p>${city}.</p>
-                <p>Sub: Application in Request of Bonafide Certificate for Internship/Apprenticeship</p>
-                <br>
-                <p>Dear Sir/Ma'am,</p>
-                <p>I am writing to request a bonafide certificate in support of my internship/apprenticeship programme at ${iname}. The internship/apprenticeship is scheduled to start from ${sdate} and end on ${edate}.</p>
-                <p>I have attached the necessary documents related to my internship/apprenticeship for your reference. Issuing a bonafide certificate will greatly assist me in fulfilling the requirements of the internship/apprenticeship programme.</p>
-                <br>
-                <p>Thank you for your attention to this matter. I would be grateful if the bonafide certificate could be issued at the earliest convenience.</p>
-                <p>Yours Sincerely,</p>
-                <br>
-                <p>(${name})</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            `;
-            break;
-            case 'training':
-            const jtitle = $('#jtitle').val();
-            const receiver = $('#receiver').val();
-            const address = $('#address').val();
-            const coname = $('#coname').val();
-            content = `
-              <div class="generated-letter">
-                <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Request Letter for Internship Training</h2>
-                <p>${receiver}</p>
-                <p>${jtitle}</p>
-                <p>${coname}</p>
-                <p>${address}</p>
-                <br>
-                <p>Dear Sir/Madam,</p>
-                <p>I, ${name}, studying in ${roll} ${branch} branch at ${institute}, am a regular and hard-working student. As a part of my course, I would have to do an internship in which I will have to learn about the roles and responsibilities of the work profile I will be looking forward to have in future.</p>
-                <p>While listing out the potential company names, I came across your company which matches with the list of requirements I have. Also, I think that I will get a lot more to learn from your organization as I have also looked at the people working at company from so many years. I feel that I can get the best hands-on experience while doing an internship with your company.</p>
-                <p>I am also attaching my resume that lists out all my academic qualifications and credentials. Also, I have attached a list of projects and assignments that I have worked throughout the semester. I would request you to have a look at it and consider my application.</p>
-                <p>I will be looking forward to hearing from you about the possibility and opportunity further.</p>
-                <br>
-                <p>Thanking you,</p>
-                <p>Yours sincerely,</p>
-                <br>
-                <p>${name}</p>
-                <p>${branch}</p>
-                <p>${roll}</p>
-            </div>
-            `;
-            break;
-          // Add more cases for other letter types
-        }
+                case 'document':
+                const reason1 = $('#reason1').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for return of original documents</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Sub: Application for return of original documents.</p>
+                    <br>
+                    <p>Respected Sir/Madam,</p>
+                    <p>I am ${name}, pursuing ${roll} in ${branch} in our college. I am writing this to request my original character and study certificates to apply for ${reason1}.</p>
+                    <p>In my present financial situation, this scholarship is very important for me.</p>
+                    <p>So please provide me with my original character & study certificates.</p>
+                    <p>I shall be grateful to you in this regard.</p>
+                    <p>Thanking you.</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  <div>  
+                `;
+                break;
+                case 'exam':
+                const reason2 = $('#reason2').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for exam permission</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>To</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Sub: Application for exam permission.</p>
+                    <br>
+                    <p>Respected Sir/Madam,</p>
+                    <p>I am ${name}, Roll no. ${roll}, a student from ${branch} branch in your college. I regret to inform you that due to my lack of attendance, I am not allowed to write the final examinations.</p>
+                    <p>I had a shortage of attendance due to ${reason2}, however, I was very well prepared for these examinations. So please help me by allowing me to the examination.</p>
+                    <p>I will be very grateful to you for that.</p>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>  
+                `;
+                break;
+                case 'marksheet':
+                const university = $('#university').val();
+                const sem = $('#sem').val();
+                const subject = $('#subject').val();
+                const obtained = $('#obtained').val();
+                const incorrect = $('#incorrect').val();
+                const year = $('#year').val();
+                const reg = $('#reg').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for Correction of Marksheet in University</h2>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>The Examination Department,</p>
+                    <p>${institute},</p>
+                    <p>${university}</p>
+                    <p>Sub: Request to update the incorrect marks in the final semester marksheet</p>
+                    <br>
+                    <p>Respected Sir/Madam,</p>
+                    <p>I, ${name}, would like to bring to your kind notice that I have received the final semester marksheet, but the marks mentioned for my ${sem} semester ${subject} paper are incorrect. I was awarded ${obtained} marks, but it is mentioned as ${incorrect} in the marksheet. It seems to be a typographical error.</p>
+                    <p>I am attaching a copy of my answer sheets along with this letter for your reference. I request you to kindly update the mark sheet at the earliest so that I can proceed with my admission procedure. I shall be highly obliged to you for the same.</p>
+                    <p>Thank you.</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>
+                `;
+                break;
+                case 'correction':
+                const reg1 = $('#reg1').val();
+                const university1 = $('#university1').val();
+                const ic = $('#ic').val();
+                const correct = $('#correct').val();
+                const year1 = $('#year1').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Application for Marksheet Correction</h2>
+                    <p>The Examination Department,</p>
+                    <p>${university1},</p>
+                    <p>Sub: Request to rectify the spelling of my name in the marksheet</p>
+                    <br>
+                    <p>Respected Sir/Madam,</p>
+                    <p>I would like to bring to your kind notice that my name is incorrectly spelt in the final year mark sheet of my Engineering. My registration number is ${reg1} and my roll number is ${roll}. I have mentioned the incorrect and correct spellings below for your reference:</p>
+                    <p><strong>Incorrect name</strong> - ${ic}</p>
+                    <p><strong>Correct name</strong> - ${correct}</p>
+                    <p>I have also attached a copy of my Aadhaar card along with the letter for verification. I request you to kindly change the spelling as mentioned above and issue the mark sheet so that it would not be a problem in the future.</p>
+                    <p>Thank you.</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  <div>  
+                `;
+                break;
+                case 'job':
+                const company = $('#company').val();
+                const position = $('#position').val();
+                const mname = $('#mname').val();
+                const shikshan = $('#shikshan').val();
+                const inte = $('#inte').val();
+                const where = $('#where').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Cover Letter for Job Application for Fresher</h2>
+                    <p>To,</p>
+                    <p>The Hiring Manager,</p>
+                    <p>${company}, ${city}.</p>
+                    <p>Subject: Application for ${position} position</p>
+                    <br>
+                    <p>Dear Mr./Ms./Mrs. ${mname},</p>
+                    <p>My name is ${name}. I came across the recent opening for ${position} on ${where}, and I believe that the role describes me perfectly. I have always been interested in the workspace that your organization is known to have in the market. I am seeking a challenging, competitive yet friendly environment, and I truly believe that working at your organization will be an enriching experience.</p>
+                    <p>I have studied ${shikshan} ${branch} at ${institute} and I have recently completed a 3-month internship at ${inte}. It helped me learn about the type of roles and responsibilities in the field of ${branch}, the work ethics that need to be followed, as well as deadlines that need to be adhered to. I possess excellent communication and team working skills.</p>
+                    <p>I have attached my resume along with the cover letter which contains my educational and professional qualifications. I will give a call to your office next week to know more about the job profile. You can also reach out to me at the contact details mentioned in the resume.</p>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>
+                `;
+                break;
+                case 'intern':
+                const iname = $('#iname').val();
+                const sdate = $('#sdate').val();
+                const edate = $('#edate').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">For Scholarship/Internship/Apprenticeship</h2>
+                    <p>To,</p>
+                    <p>The Principal,</p>
+                    <p>${institute},</p>
+                    <p>${city}.</p>
+                    <p>Sub: Application in Request of Bonafide Certificate for Internship/Apprenticeship</p>
+                    <br>
+                    <p>Dear Sir/Ma'am,</p>
+                    <p>I am writing to request a bonafide certificate in support of my internship/apprenticeship programme at ${iname}. The internship/apprenticeship is scheduled to start from ${sdate} and end on ${edate}.</p>
+                    <p>I have attached the necessary documents related to my internship/apprenticeship for your reference. Issuing a bonafide certificate will greatly assist me in fulfilling the requirements of the internship/apprenticeship programme.</p>
+                    <br>
+                    <p>Thank you for your attention to this matter. I would be grateful if the bonafide certificate could be issued at the earliest convenience.</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>  
+                `;
+                break;
+                case 'training':
+                const jtitle = $('#jtitle').val();
+                const receiver = $('#receiver').val();
+                const address = $('#address').val();
+                const coname = $('#coname').val();
+                content = `
+                  <div class="generated-letter">
+                    <h2 style="text-align:center;padding-bottom:50px; font-weight:bold;">Request Letter for Internship Training</h2>
+                    <p>${receiver}</p>
+                    <p>${jtitle}</p>
+                    <p>${coname}</p>
+                    <p>${address}</p>
+                    <br>
+                    <p>Dear Sir/Madam,</p>
+                    <p>I, ${name}, studying in ${roll} ${branch} branch at ${institute}, am a regular and hard-working student. As a part of my course, I would have to do an internship in which I will have to learn about the roles and responsibilities of the work profile I will be looking forward to have in future.</p>
+                    <p>While listing out the potential company names, I came across your company which matches with the list of requirements I have. Also, I think that I will get a lot more to learn from your organization as I have also looked at the people working at company from so many years. I feel that I can get the best hands-on experience while doing an internship with your company.</p>
+                    <p>I am also attaching my resume that lists out all my academic qualifications and credentials. Also, I have attached a list of projects and assignments that I have worked throughout the semester. I would request you to have a look at it and consider my application.</p>
+                    <p>I will be looking forward to hearing from you about the possibility and opportunity further.</p>
+                    <br>
+                    <p>Thanking you,</p>
+                    <div class="rightAlign">
+                    <p>Yours Sincerely,</p>
+                    <img src="${imageUrl}" alt="Uploaded Image">
+                    <p>${name}</p>
+                    <p>${branch}</p>
+                    <p>${roll}</p>
+                    </div>
+                  </div>
+                `;
+                break;
+                
+                default:
+                  break;
+              
+              // Add more cases for other letter types
+            }
+            $('#generatedLetter').html(content).show();
+            $('#downloadBtn').show();
+        };
+      if (image) {
+        reader.readAsDataURL(image);
+      }
         return content;
       }
       function resetForm() {
@@ -798,7 +940,19 @@
         // Reset other fields as needed
       }
     </script>
+    
     </div>
+    
+
+    <script>
+                    function changeColor(color) {
+          document.body.style.backgroundColor = color;
+      }
+
+
+
+    </script>
+    
     <div class="container">
       <footer class="py-5 mt-3" style="border-top:2px solid black; padding-bottom: 0;">
         <div class="row">
@@ -823,7 +977,13 @@
         </svg></a></li>
       </ul>
       </div>
-      
+      <div id="colorPalette" class="row justify-content-center justify-content-md-center py-4 my-1 text-center">
+        <div class="color" style="background-color: #2aee07" onclick="changeColor('#2aee07')"></div>
+        <div class="color" style="background-color: #D2001A" onclick="changeColor('#D2001A')"></div>
+        <div class="color" style="background-color: #7F27FF" onclick="changeColor('#7F27FF')"></div>
+        <div class="color" style="background-color: #00A6ED" onclick="changeColor('#00A6ED')"></div>
+        <div class="color" style="background-color: #F5F7F8" onclick="changeColor('#F5F7F8')"></div>
+      </div>
     </footer>
     </div>
     
